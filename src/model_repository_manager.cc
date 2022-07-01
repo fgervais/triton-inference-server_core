@@ -2048,6 +2048,7 @@ ModelRepositoryManager::Poll(
         }
       }
       if (!exists) {
+        LOG_VERBOSE(1) << "MODEL DOES NOT EXIST: " << model.first;
         deleted->insert(model.first);
       }
     }
