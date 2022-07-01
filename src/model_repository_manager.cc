@@ -1703,7 +1703,9 @@ ModelRepositoryManager::LoadUnloadModels(
 #endif  // TRITON_ENABLE_ENSEMBLE
       while (!current_models.empty()) {
         bool polled = true;
-        LOG_VERBOSE(1) << "[LoadUnloadModels] Calling poll for '" << current_models[0] << "'";
+        for (const auto& model : current_models) {
+          LOG_VERBOSE(1) << "[LoadUnloadModels] Calling poll for '" << model.first << "'";
+        }
         RETURN_IF_ERROR(Poll(
             current_models, &added, &deleted, &modified, &unmodified,
             &new_infos, &polled));
@@ -1717,7 +1719,7 @@ ModelRepositoryManager::LoadUnloadModels(
           auto it = new_infos.find(model.first);
           // Some models may be marked as deleted and not in 'new_infos'
           if (it != new_infos.end()) {
-            LOG_VERBOSE(1) << "[LoadUnloadModels] model '" << current_models[0] << "' WAS found in new_infos map";
+            LOG_VERBOSE(1) << "[LoadUnloadModels] model '" << model.first << "' WAS found in new_infos map";
             it->second->explicitly_load_ = first_iteration;
             const auto& config = it->second->model_config_;
             if (config.has_ensemble_scheduling()) {
@@ -1729,10 +1731,10 @@ ModelRepositoryManager::LoadUnloadModels(
                 }
               }
             }
+          } else {
+            LOG_VERBOSE(1) << "[LoadUnloadModels] model '" << current_models[0] << "' was not found in new_infos map";
           }
-        } else {
-          LOG_VERBOSE(1) << "[LoadUnloadModels] model '" << current_models[0] << "' was not found in new_infos map";
-        }
+        } 
         first_iteration = false;
 #endif  // TRITON_ENABLE_ENSEMBLE
         current_models.swap(next_models);
