@@ -1703,6 +1703,7 @@ ModelRepositoryManager::LoadUnloadModels(
 #endif  // TRITON_ENABLE_ENSEMBLE
       while (!current_models.empty()) {
         bool polled = true;
+        LOG_VERBOSE(1) << "[LoadUnloadModels] Calling poll for '" << current_models[0] << "'";
         RETURN_IF_ERROR(Poll(
             current_models, &added, &deleted, &modified, &unmodified,
             &new_infos, &polled));
@@ -1716,6 +1717,7 @@ ModelRepositoryManager::LoadUnloadModels(
           auto it = new_infos.find(model.first);
           // Some models may be marked as deleted and not in 'new_infos'
           if (it != new_infos.end()) {
+            LOG_VERBOSE(1) << "[LoadUnloadModels] model '" << current_models[0] << "' WAS found in new_infos map";
             it->second->explicitly_load_ = first_iteration;
             const auto& config = it->second->model_config_;
             if (config.has_ensemble_scheduling()) {
@@ -1728,6 +1730,8 @@ ModelRepositoryManager::LoadUnloadModels(
               }
             }
           }
+        } else {
+          LOG_VERBOSE(1) << "[LoadUnloadModels] model '" << current_models[0] << "' was not found in new_infos map";
         }
         first_iteration = false;
 #endif  // TRITON_ENABLE_ENSEMBLE
@@ -1735,15 +1739,24 @@ ModelRepositoryManager::LoadUnloadModels(
       }
 
       // Only update the infos when all validation is completed
+      LOG_VERBOSE(1) << "ADDED MODELS";
       for (const auto& model_name : added) {
+        LOG_VERBOSE(1) << "\t " << model_name;
         auto nitr = new_infos.find(model_name);
         infos_.emplace(model_name, std::move(nitr->second));
       }
+      LOG_VERBOSE(1) << "MODIFIED MODELS";
       for (const auto& model_name : modified) {
+        LOG_VERBOSE(1) << "\t " << model_name;
         auto nitr = new_infos.find(model_name);
         auto itr = infos_.find(model_name);
         itr->second = std::move(nitr->second);
       }
+      LOG_VERBOSE(1) << "DELETED MODELS";
+      for (const auto& model_name : deleted) {
+        LOG_VERBOSE(1) << "\t " << model_name;
+      }
+
     }
   }
   std::set<std::string> deleted_dependents;
@@ -1752,6 +1765,11 @@ ModelRepositoryManager::LoadUnloadModels(
   UpdateDependencyGraph(
       added, deleted, modified,
       unload_dependents ? &deleted_dependents : nullptr);
+
+  LOG_VERBOSE(1) << "DELETED DEPENDENTS MODELS";
+  for (const auto& model_name : deleted_dependents) {
+    LOG_VERBOSE(1) << "\t " << model_name;
+  }
 
   // The models are in 'deleted' either when they are asked to be unloaded or
   // they are not found / are duplicated across all model repositories.
