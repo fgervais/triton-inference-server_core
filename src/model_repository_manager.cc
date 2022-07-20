@@ -1999,7 +1999,7 @@ ModelRepositoryManager::Poll(
         bool exists_in_this_repo = false;
         auto full_path = model_it->second.second;
         Status status = FileExists(full_path, &exists_in_this_repo);
-        if (!status.IsOk()) {
+        if (!status.IsOk() || !exists_in_this_repo) {
           LOG_VERBOSE(1) << "File does not exist, setting all_models_polled=false";
           LOG_ERROR << "failed to poll mapped path '" << full_path
                     << "' for model '" << model.first
