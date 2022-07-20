@@ -1945,6 +1945,7 @@ ModelRepositoryManager::Poll(
     std::set<std::string>* modified, std::set<std::string>* unmodified,
     ModelInfoMap* updated_infos, bool* all_models_polled)
 {
+  LOG_VERBOSE(1) << "Inside Poll()!";
   *all_models_polled = true;
   // empty path is the special case to indicate the model should be loaded
   // from override file content in 'models'.
@@ -1983,6 +1984,7 @@ ModelRepositoryManager::Poll(
     }
   } else {
     for (const auto& model : models) {
+      LOG_VERBOSE(1) << "models NOT empty";
       // Skip repository polling if override model files
       if (ModelDirectoryOverride(model.second)) {
         LOG_VERBOSE(1) << "ModelDirectoryOverride";
@@ -2016,10 +2018,14 @@ ModelRepositoryManager::Poll(
           *all_models_polled = false;
         }
       } else {
+        LOG_VERBOSE(1) << "model not found in model mappings";
         for (const auto repository_path : repository_paths_) {
+          LOG_VERBOSE(1) << "for each repo path";
           bool exists_in_this_repo = false;
           const auto full_path = JoinPath({repository_path, model.first});
           Status status = FileExists(full_path, &exists_in_this_repo);
+          LOG_VERBOSE(1) << "FileExists called for full_path: " << full_path;
+          LOG_VERBOSE(1) << "FileExists status: " << status.Message();
           if (!status.IsOk()) {
             LOG_VERBOSE(1) << "does NOT exists in this repo 222, setting all_models_polled=false";
             LOG_ERROR << "failed to poll model repository '" << repository_path
@@ -2055,6 +2061,8 @@ ModelRepositoryManager::Poll(
               *all_models_polled = false;
               break;
             }
+          } else {
+            LOG_VERBOSE << "PATH EXISTEd AND NOT MAPPED IN REPO";
           }
         }
       }
