@@ -1953,6 +1953,7 @@ ModelRepositoryManager::Poll(
   // If no model is specified, poll all models in all model repositories.
   // Otherwise, only poll the specified models
   if (models.empty()) {
+    LOG_VERBOSE(1) << "MODELS EMPTY ";
     std::set<std::string> duplicated_models;
     for (const auto& repository_path : repository_paths_) {
       std::set<std::string> subdirs;
@@ -1974,6 +1975,7 @@ ModelRepositoryManager::Poll(
     }
     // If the model is not unique, mark as deleted to unload it
     for (const auto& model : duplicated_models) {
+      LOG_VERBOSE(1) << "DUPLICATED MODELS";
       model_to_path.erase(model);
       deleted->insert(model);
       LOG_ERROR << "failed to poll model '" << model
@@ -1983,6 +1985,7 @@ ModelRepositoryManager::Poll(
     for (const auto& model : models) {
       // Skip repository polling if override model files
       if (ModelDirectoryOverride(model.second)) {
+        LOG_VERBOSE(1) << "ModelDirectoryOverride";
         model_to_path.emplace(model.first, "");
         continue;
       }
@@ -1990,19 +1993,23 @@ ModelRepositoryManager::Poll(
       bool exists = false;
       auto model_it = model_mappings_.find(model.first);
       if (model_it != model_mappings_.end()) {
+        LOG_VERBOSE(1) << "model_it != modelmappings end()";
         bool exists_in_this_repo = false;
         auto full_path = model_it->second.second;
         Status status = FileExists(full_path, &exists_in_this_repo);
         if (!status.IsOk()) {
+          LOG_VERBOSE(1) << "File does not exist, setting all_models_polled=false";
           LOG_ERROR << "failed to poll mapped path '" << full_path
                     << "' for model '" << model.first
                     << "': " << status.Message();
           *all_models_polled = false;
         }
         if (exists_in_this_repo) {
+          LOG_VERBOSE(1) << "exists in this repo";
           model_to_path.emplace(model.first, model_it->second.second);
           exists = true;
         } else {
+          LOG_VERBOSE(1) << "does NOT exists in this repo, setting all_models_polled=false";
           LOG_ERROR << "mapped path '" << full_path
                     << "' does not exist for model '" << model.first << "'";
           exists = false;
@@ -2014,11 +2021,13 @@ ModelRepositoryManager::Poll(
           const auto full_path = JoinPath({repository_path, model.first});
           Status status = FileExists(full_path, &exists_in_this_repo);
           if (!status.IsOk()) {
+            LOG_VERBOSE(1) << "does NOT exists in this repo 222, setting all_models_polled=false";
             LOG_ERROR << "failed to poll model repository '" << repository_path
                       << "' for model '" << model.first
                       << "': " << status.Message();
             *all_models_polled = false;
           } else if (exists_in_this_repo) {
+            LOG_VERBOSE(1) << "does exists in this repo 222";
             // Check to make sure this directory is not mapped.
             // If mapped, continue to next repository path.
             bool mapped = false;
@@ -2029,6 +2038,7 @@ ModelRepositoryManager::Poll(
               }
             }
             if (mapped) {
+              LOG_VERBOSE(1) << "mapped=true continue";
               continue;
             }
 
@@ -2037,6 +2047,7 @@ ModelRepositoryManager::Poll(
             if (res.second) {
               exists = true;
             } else {
+              LOG_VERBOSE(1) << "res.second=false exists=false, setting all_models_polled=false";
               exists = false;
               model_to_path.erase(res.first);
               LOG_ERROR << "failed to poll model '" << model.first
