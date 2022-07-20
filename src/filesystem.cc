@@ -176,6 +176,7 @@ Status
 LocalFileSystem::FileExists(const std::string& path, bool* exists)
 {
   *exists = (access(path.c_str(), F_OK) == 0);
+  LOG_VERBOSE(1) << "LocalFileSystem FileExists, path [" << path << "] exists: " <<*exists;
   return Status::Success;
 }
 
@@ -2064,6 +2065,7 @@ FileExists(const std::string& path, bool* exists)
 {
   FileSystem* fs;
   RETURN_IF_ERROR(GetFileSystem(path, &fs));
+  LOG_VERBOSE(1) << "FileExists filesystem path: " << path;
   return fs->FileExists(path, exists);
 }
 
