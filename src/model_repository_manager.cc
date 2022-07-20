@@ -2062,7 +2062,7 @@ ModelRepositoryManager::Poll(
               break;
             }
           } else {
-            LOG_VERBOSE << "PATH EXISTEd AND NOT MAPPED IN REPO";
+            LOG_VERBOSE(1) << "PATH EXISTEd AND NOT MAPPED IN REPO";
           }
         }
       }
