@@ -437,6 +437,7 @@ ModelRepositoryManager::PollAndUpdateInternal(bool* all_models_polled)
     if ((added.find(pr.first) == added.end()) &&
         (modified.find(pr.first) == modified.end()) &&
         (unmodified.find(pr.first) == unmodified.end())) {
+      LOG_INFO << "Inserting model [" << pr.first << "] to deleted list in PollAndUpdateInternal()";
       deleted.insert(pr.first);
     }
   }
@@ -612,6 +613,7 @@ ModelRepositoryManager::LoadUnloadModels(
   {
     if (type == ActionType::UNLOAD) {
       for (const auto& model : models) {
+        LOG_INFO << "Inserting model [" << model.first << "] to deleted list in LoadUnloadModels()";
         deleted.insert(model.first);
       }
     } 
@@ -682,6 +684,7 @@ ModelRepositoryManager::LoadUnloadModels(
   // The models are in 'deleted' either when they are asked to be unloaded or
   // they are not found / are duplicated across all model repositories.
   // In all cases, should unload them and remove from 'infos_' explicitly.
+  LOG_INFO << "UNLOAD_DEPENDENTS: " << unload_dependents;
   for (const auto& name : (unload_dependents ? deleted_dependents : deleted)) {
     infos_.erase(name);
     LOG_INFO << "Unloading 'deleted' model in LoadUnloadModels(): " << name;
@@ -882,6 +885,7 @@ ModelRepositoryManager::Poll(
     // If the model is not unique, mark as deleted to unload it
     for (const auto& model : duplicated_models) {
       model_to_path.erase(model);
+      LOG_INFO << "Inserting model [" << model << "] to deleted list in Poll()";
       deleted->insert(model);
       LOG_ERROR << "failed to poll model '" << model
                 << "': not unique across all model repositories";
