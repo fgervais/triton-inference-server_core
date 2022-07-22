@@ -2706,6 +2706,7 @@ TRITONSERVER_ServerLoadModel(
 {
   tc::InferenceServer* lserver = reinterpret_cast<tc::InferenceServer*>(server);
 
+  LOG_VERBOSE(1) << "Loading model in TRITONSERVER_ServerLoadModel() for model: " << model_name;
   RETURN_IF_STATUS_ERROR(lserver->LoadModel({{std::string(model_name), {}}}));
 
   return nullptr;  // success

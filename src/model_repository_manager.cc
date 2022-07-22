@@ -451,6 +451,7 @@ ModelRepositoryManager::PollAndUpdateInternal(bool* all_models_polled)
   UpdateDependencyGraph(added, deleted, modified);
 
   for (const auto& name : deleted) {
+    LOG_VERBOSE(1) << "Unloading 'deleted' model in PollAndUpdateInternal(): " << name;
     model_life_cycle_->AsyncUnload(name);
   }
 
@@ -477,6 +478,7 @@ ModelRepositoryManager::LoadModelByDependency()
     loaded_models.clear();
     // Unload invalid models first
     for (auto& invalid_model : set_pair.second) {
+      LOG_VERBOSE(1) << "Unloading 'invalid' model in LoadModelByDependency(): " << name;
       model_life_cycle_->AsyncUnload(invalid_model->model_name_);
       LOG_ERROR << invalid_model->status_.AsString();
       invalid_model->loaded_versions_ = std::set<int64_t>();
@@ -680,6 +682,7 @@ ModelRepositoryManager::LoadUnloadModels(
   // In all cases, should unload them and remove from 'infos_' explicitly.
   for (const auto& name : (unload_dependents ? deleted_dependents : deleted)) {
     infos_.erase(name);
+    LOG_VERBOSE(1) << "Unloading 'deleted' model in LoadUnloadModels(): " << name;
     model_life_cycle_->AsyncUnload(name);
   }
 
@@ -711,6 +714,7 @@ ModelRepositoryManager::UnloadAllModels()
 {
   Status status;
   for (const auto& name_info : infos_) {
+    LOG_VERBOSE(1) << "Unloading 'infos_' model in UnloadAllModels(): " << name_info.first;
     Status unload_status = model_life_cycle_->AsyncUnload(name_info.first);
     if (!unload_status.IsOk()) {
       status = Status(
@@ -1384,6 +1388,7 @@ ModelRepositoryManager::UnregisterModelRepository(const std::string& repository)
       }
     }
     for (auto const& model : models_to_delete) {
+      LOG_VERBOSE(1) << "Deleting model mapping in UnregisterModelRepository() for model: " << model;
       model_mappings_.erase(model);
     }
   }

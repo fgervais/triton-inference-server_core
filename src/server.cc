@@ -519,6 +519,7 @@ InferenceServer::LoadModel(
   ScopedAtomicIncrement inflight(inflight_request_counter_);
 
   auto action_type = ActionType::LOAD;
+  LOG_VERBOSE(1) << "Loading model in IS::LoadModel()";
   return model_repository_manager_->LoadUnloadModel(
       models, action_type, false /* unload_dependents */);
 }
@@ -534,6 +535,7 @@ InferenceServer::UnloadModel(
   ScopedAtomicIncrement inflight(inflight_request_counter_);
 
   auto action_type = ActionType::UNLOAD;
+  LOG_VERBOSE(1) << "Unloading model in IS::UnloadModel(): " << model_name;
   return model_repository_manager_->LoadUnloadModel(
       {{model_name, {}}}, action_type, unload_dependents);
 }
