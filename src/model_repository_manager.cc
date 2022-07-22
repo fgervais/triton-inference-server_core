@@ -478,7 +478,7 @@ ModelRepositoryManager::LoadModelByDependency()
     loaded_models.clear();
     // Unload invalid models first
     for (auto& invalid_model : set_pair.second) {
-      LOG_VERBOSE(1) << "Unloading 'invalid' model in LoadModelByDependency(): " << name;
+      LOG_VERBOSE(1) << "Unloading 'invalid' model in LoadModelByDependency(): " << invalid_model->model_name;
       model_life_cycle_->AsyncUnload(invalid_model->model_name_);
       LOG_ERROR << invalid_model->status_.AsString();
       invalid_model->loaded_versions_ = std::set<int64_t>();
