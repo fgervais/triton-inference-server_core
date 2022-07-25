@@ -91,7 +91,7 @@ struct TRITONSERVER_MetricFamily;
 ///   }
 ///
 #define TRITONSERVER_API_VERSION_MAJOR 1
-#define TRITONSERVER_API_VERSION_MINOR 15
+#define TRITONSERVER_API_VERSION_MINOR 16
 
 /// Get the TRITONBACKEND API version supported by the Triton shared
 /// library. This value can be compared against the
@@ -1766,7 +1766,7 @@ TRITONSERVER_ServerOptionsSetModelLoadThreadCount(
 /// \param options The server options object.
 /// \param file a string defining the file where the log outputs will be saved.
 /// \return a TRITONSERVER_Error indicating success or failure.
-TRITONSERVER_DECLSPEC TRITONSERVER_Error* TRITONSERVER_ServerOptionsSetLogOutFile(
+TRITONSERVER_DECLSPEC TRITONSERVER_Error* TRITONSERVER_ServerOptionsSetLogFile(
     TRITONSERVER_ServerOptions* options, const char* file);
 
 /// Enable or disable info level logging.
